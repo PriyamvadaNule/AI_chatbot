@@ -2,4 +2,5 @@ streamlit
 wikipedia
 transformers==4.38.1
 torch==2.2.2
-gtts
+gTTs
+numpy
