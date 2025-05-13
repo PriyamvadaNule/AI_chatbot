@@ -19,7 +19,7 @@ if query:
         context = None
 
     if context:
-        qa_pipeline = pipeline("question-answering")
+        qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
         answer = qa_pipeline(question=query, context=context)["answer"]
 
         st.markdown("### ✅ Answer:")
