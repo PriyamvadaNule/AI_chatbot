@@ -21,4 +21,3 @@ Just type your question in the input box and get instant results — in both tex
 
 💡 This chatbot is accessible 24/7 from **any device** — phone, tablet, or laptop.
 Built using **Python, Wikipedia API, Google Search, gTTS, and Gradio**.
-Hosted for free on **Hugging Face Spaces**.
