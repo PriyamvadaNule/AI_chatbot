@@ -1,5 +1,5 @@
 streamlit
 wikipedia
-transformers
-torch
+transformers==4.38.1
+torch==2.2.2
 gtts
