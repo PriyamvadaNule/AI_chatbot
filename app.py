@@ -1,44 +1,46 @@
 import streamlit as st
 import wikipedia
-from transformers import pipeline
 from gtts import gTTS
 import os
-import numpy as np  # Required by transformers
 
-# Title and description
+try:
+    import numpy as np  # Needed by transformers
+except ImportError:
+    st.error("🚨 Numpy not available. Please check your environment.")
+    st.stop()
+
+try:
+    from transformers import pipeline
+except ImportError:
+    st.error("🚨 Transformers not available. Check your requirements.txt")
+    st.stop()
+
 st.title("📚 WikiTalk AI Chatbot")
 st.write("Ask me anything. I’ll search Wikipedia and speak the answer!")
 
-# Input from user
 query = st.text_input("🔍 Your Question:")
 
 if query:
     try:
-        # Get summary from Wikipedia
+        # Wikipedia summary
         context = wikipedia.summary(query, sentences=5)
         st.markdown("**📖 Wikipedia Summary:**")
         st.write(context)
 
-        # Load the question-answering pipeline
+        # QA model
         qa_pipeline = pipeline("question-answering")
-
-        # Get answer from model
         result = qa_pipeline(question=query, context=context)
         answer = result["answer"]
 
-        # Display the answer
+        # Display answer
         st.markdown("### ✅ Answer:")
         st.success(answer)
 
-        # Text-to-Speech
+        # Text to Speech
         tts = gTTS(text=answer, lang='en')
         tts.save("answer.mp3")
-
-        # Play the audio
         with open("answer.mp3", "rb") as audio_file:
             st.audio(audio_file.read(), format="audio/mp3")
-
-        # Cleanup
         os.remove("answer.mp3")
 
     except wikipedia.exceptions.DisambiguationError:
