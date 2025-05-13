@@ -1,33 +1,41 @@
 import streamlit as st
-import wikipedia
 from transformers import pipeline
-from gtts import gTTS
-import os
+import wikipedia
 
-st.title("📚 WikiTalk AI Chatbot")
-st.write("Ask me anything. I’ll search Wikipedia and speak the answer!")
+# Set the title of the app
+st.set_page_config(page_title="AI Chatbot (Wikipedia QA)", layout="centered")
+st.title("🤖 AI Chatbot Based on Wikipedia")
+st.markdown("Ask me anything about a topic! I’ll fetch data from Wikipedia and answer using a QA model.")
 
-query = st.text_input("🔍 Your Question:")
+# Load the question-answering pipeline
+@st.cache_resource
+def load_model():
+    return pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
 
-if query:
+qa_pipeline = load_model()
+
+# User input
+topic = st.text_input("📚 Enter a topic:", placeholder="e.g. Python programming")
+query = st.text_input("❓ Ask a question about the topic:", placeholder="e.g. What is Python used for?")
+
+# When both topic and query are entered
+if topic and query:
     try:
-        context = wikipedia.summary(query, sentences=5)
-        st.markdown("**Wikipedia Summary:**")
-        st.write(context)
-    except:
-        st.error("❌ Couldn't find that topic. Try again.")
-        context = None
+        # Get summary from Wikipedia
+        context = wikipedia.summary(topic)
+        # Truncate context to fit model's token limit
+        context = " ".join(context.split()[:450])  # ~512 tokens max for distilBERT
 
-    if context:
-        qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
-        answer = qa_pipeline(question=query, context=context)["answer"]
+        # Get the answer
+        result = qa_pipeline(question=query, context=context)
+        answer = result["answer"]
 
         st.markdown("### ✅ Answer:")
         st.success(answer)
 
-        tts = gTTS(text=answer, lang='en')
-        tts.save("answer.mp3")
-        audio_file = open("answer.mp3", "rb")
-        st.audio(audio_file.read(), format="audio/mp3")
-        audio_file.close()
-        os.remove("answer.mp3")
+    except wikipedia.exceptions.DisambiguationError as e:
+        st.error("The topic you entered is too broad. Please be more specific.")
+    except wikipedia.exceptions.PageError:
+        st.error("The topic was not found on Wikipedia.")
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
