@@ -73,3 +73,6 @@ You can deploy it for free using **Streamlit Cloud** — no terminal or paid ser
 ---
 
 Enjoy exploring knowledge with your smart AI assistant! 🌍🔍🎧
+
+Website link: https://aichatbot-wikipediasearch.streamlit.app/
+
